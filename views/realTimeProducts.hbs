@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Products</title>
+</head>
+<body>
+    <h1>Real-Time Products</h1>
+    <ul id="lista-productos">
+        {{#each productos}}
+            <li>{{this}}</li>
+        {{/each}}
+    </ul>
+
+    <form id="agregarForm">
+        <input type="text" id="productoInput" placeholder="Nombre del producto">
+        <button type="submit">Agregar Producto</button>
+    </form>
+
+    <form id="eliminarForm">
+        <input type="number" id="indiceInput" placeholder="Índice del producto a eliminar">
+        <button type="submit">Eliminar Producto</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Escuchar evento para recibir la lista inicial de productos
+        socket.on('productosActualizados', (productos) => {
+            actualizarListaProductos(productos);
+        });
+
+        // Función para actualizar la lista de productos en la vista
+        function actualizarListaProductos(productos) {
+            const listaProductos = document.querySelector('#lista-productos');
+            listaProductos.innerHTML = ''; // Limpiar la lista antes de actualizar
+
+            productos.forEach(producto => {
+                const nuevoProducto = document.createElement('li');
+                nuevoProducto.textContent = producto;
+                listaProductos.appendChild(nuevoProducto);
+            });
+        }
+
+        // Enviar evento al servidor al agregar un producto
+        document.getElementById('agregarForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const productoInput = document.getElementById('productoInput').value.trim();
+            if (productoInput !== '') {
+                socket.emit('agregarProducto', productoInput);
+                document.getElementById('productoInput').value = ''; // Limpiar el campo de entrada
+            }
+        });
+
+        // Enviar evento al servidor al eliminar un producto
+        document.getElementById('eliminarForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const indiceInput = parseInt(document.getElementById('indiceInput').value);
+            if (!isNaN(indiceInput)) {
+                socket.emit('eliminarProducto', indiceInput);
+                document.getElementById('indiceInput').value = ''; // Limpiar el campo de entrada
+            }
+        });
+    </script>
+</body>
+</html>
