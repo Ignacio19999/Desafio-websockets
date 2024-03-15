@@ -12,21 +12,17 @@
             <li>{{nombre}} - Precio: ${{precio}}</li>
         {{/each}}
     </ul>
-
-    <!-- Script para manejar la conexión WebSocket -->
+    
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-
-        // Escuchar evento para recibir la lista inicial de productos
         socket.on('productosActualizados', (productos) => {
             actualizarListaProductos(productos);
         });
 
-        // Función para actualizar la lista de productos en la vista
         function actualizarListaProductos(productos) {
             const listaProductos = document.querySelector('#lista-productos');
-            listaProductos.innerHTML = ''; // Limpiar la lista antes de actualizar
+            listaProductos.innerHTML = '';
 
             productos.forEach(producto => {
                 const nuevoProducto = document.createElement('li');
