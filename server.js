@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/realTimeProducts', (req, res) => {
-    res.render('realTimeProducts'); // Renderiza la vista "realTimeProducts.hbs"
+    res.render('realTimeProducts'); 
 });
 
 
@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
 
     socket.on('agregarProducto', (producto) => {
         productos.push(producto);
-        // Emitir evento a todos los clientes con la lista actualizada de productos
+        
         io.emit('productosActualizados', productos);
     });
 
