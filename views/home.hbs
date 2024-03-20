@@ -3,33 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de consolas de videojuegos</title>
+    <title>VideoGamers</title>
 </head>
 <body>
-    <h1>Nuestras consolas de videojuegos</h1>
-    <ul>
-        {{#each productos}}
-            <li>{{nombre}} - Precio: ${{precio}}</li>
-        {{/each}}
-    </ul>
-    
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        socket.on('productosActualizados', (productos) => {
-            actualizarListaProductos(productos);
-        });
-
-        function actualizarListaProductos(productos) {
-            const listaProductos = document.querySelector('#lista-productos');
-            listaProductos.innerHTML = '';
-
-            productos.forEach(producto => {
-                const nuevoProducto = document.createElement('li');
-                nuevoProducto.textContent = producto.nombre + " - Precio: $" + producto.precio;
-                listaProductos.appendChild(nuevoProducto);
-            });
-        }
-    </script>
+    <h1>Bienvenido a VideoGamers</h1>
+    <p>Esta es la página principal de nuestro arsenal de juegos y consolas</p>
+    <p><a href="/realtimeproducts">Ver Productos en Tiempo Real</a></p>
 </body>
 </html>

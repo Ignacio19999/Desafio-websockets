@@ -2,60 +2,35 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const hbs = require('hbs');
+const path = require('path');
+const productManager = require('./productManager');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
 app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
 
-app.use(express.static('assets'));
-
-let productos = [
-    { nombre: 'PlayStation 5', precio: 1000000 },
-    { nombre: 'Xbox Series X', precio: 800000 },
-    { nombre: 'Nintendo Switch', precio: 600000},
-];
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-    console.log('Productos:', productos); 
-    res.render('home', { productos });
+    res.render('index');
 });
 
-app.get('/realTimeProducts', (req, res) => {
-    res.render('realTimeProducts'); 
+app.get('/realtimeproducts', (req, res) => {
+    const productos = productManager.getProductos();
+    res.render('realtimeproducts', { productos });
 });
-
 
 io.on('connection', (socket) => {
     console.log('Cliente conectado');
 
-    socket.on('agregarProducto', (producto) => {
-        productos.push(producto);
-        
-        io.emit('productosActualizados', productos);
-    });
-
-    
-    socket.on('eliminarProducto', (indice) => {
-        productos.splice(indice, 1);
-    
-        io.emit('productosActualizados', productos);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('Cliente desconectado');
-    });
-});
-
-app.post('/crearProducto', (req, res) => {
-    io.emit('nuevoProducto', 'Nuevo producto creado');
-    res.send('Producto creado exitosamente');
+    const productos = productManager.getProductos();
+    socket.emit('productosActualizados', productos);
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
-
-module.exports = { app, io };
