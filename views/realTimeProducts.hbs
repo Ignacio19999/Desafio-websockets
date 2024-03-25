@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Time Products</title>
+    <title>Productos a tiempo real</title>
 </head>
 <body>
     <h1>Lista de Productos en Tiempo Real</h1>
@@ -13,26 +13,44 @@
         {{/each}}
     </ul>
 
+    <form id="formAgregarProducto">
+        <input type="text" id="nombreProducto" placeholder="Nombre del Producto">
+        <input type="number" id="precioProducto" placeholder="Precio del Producto">
+        <button type="submit">Sumar producto</button>
+    </form>
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
 
-        // Escuchar evento para recibir la lista inicial de productos
         socket.on('productosActualizados', (productos) => {
             actualizarListaProductos(productos);
         });
 
-        // Función para actualizar la lista de productos en la vista
         function actualizarListaProductos(productos) {
-            const listaProductos = document.querySelector('#lista-productos');
-            listaProductos.innerHTML = ''; // Limpiar la lista antes de actualizar
+            const listaProductos = document.querySelector('ul');
+            listaProductos.innerHTML = ''; 
 
             productos.forEach(producto => {
                 const nuevoProducto = document.createElement('li');
-                nuevoProducto.textContent = producto.nombre + " - Precio: $" + producto.precio;
+                nuevoProducto.textContent = `${producto.nombre} - Precio: $${producto.precio}`;
                 listaProductos.appendChild(nuevoProducto);
             });
         }
+
+        document.getElementById('formAgregarProducto').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const nombre = document.getElementById('nombreProducto').value;
+            const precio = document.getElementById('precioProducto').value;
+            if (nombre.trim() && precio.trim()) {
+                const nuevoProducto = { nombre, precio: parseFloat(precio) };
+                socket.emit('agregarProducto', nuevoProducto);
+                document.getElementById('nombreProducto').value = '';
+                document.getElementById('precioProducto').value = '';
+            } else {
+                alert('Por favor ingresa un nombre y un precio válido para el producto.');
+            }
+        });
     </script>
 </body>
 </html>
