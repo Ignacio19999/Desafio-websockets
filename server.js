@@ -1,46 +1,20 @@
 const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const hbs = require('hbs');
-const path = require('path');
-const ProductManager = require('./ProductManager');
+const mongoose = require('mongoose');
+const consoleRoutes = require('./routes/consoles');
+const cartRoutes = require('./routes/carts');
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
 
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
+mongoose.connect('mongodb://localhost:27017/tu_base_de_datos', { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Conexión a MongoDB establecida'))
+  .catch(err => console.error('Error al conectar a MongoDB:', err));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.render('home');
-});
-
-app.get('/realtimeproducts', (req, res) => {
-    const productos = ProductManager.getProductos();
-    res.render('realTimeProducts', { productos });
-});
-
-io.on('connection', (socket) => {
-    console.log('Cliente conectado');
-
-    const productos = ProductManager.getProductos();
-    socket.emit('productosActualizados', productos);
-
-    socket.on('agregarProducto', (producto) => {
-        ProductManager.agregarProducto(producto);
-        io.emit('productosActualizados', ProductManager.getProductos());
-    });
-
-    socket.on('eliminarProducto', (index) => {
-        ProductManager.eliminarProducto(index);
-        io.emit('productosActualizados', ProductManager.getProductos());
-    });
-});
+app.use('/consoles', consoleRoutes);
+app.use('/carts', cartRoutes);
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
