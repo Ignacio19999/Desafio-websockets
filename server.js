@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const productRoutes = require('./routes/products');
-const cartRoutes = require('./routes/carts');
+const consolesRoutes = require('./routes/consoles');
 
 const app = express();
 
@@ -15,7 +15,7 @@ mongoose.connect(mongodbURI, { useNewUrlParser: true, useUnifiedTopology: true }
 app.use(express.json());
 
 app.use('/products', productRoutes);
-app.use('/carts', cartRoutes);
+app.use('/consoles', consolesRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
