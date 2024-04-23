@@ -26,9 +26,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use('./views/products', productRoutes);
+app.use('/products', productRoutes);
 
-app.use('./views/consoles', consoleRoutes);
+app.use('/consoles', consoleRoutes);
 
 app.get('/', (req, res) => {
   res.render('home'); 
